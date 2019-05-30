@@ -1,15 +1,12 @@
 import gym
 import numpy as np
 
-env = gym.make('MountainCar-v0')
-#env = gym.make('BipedalWalker-v2')
-
-MAX_EPISODES = 10
+MAX_EPISODES = 50000
 STEPS_PER_EPISODE = 200                           # Mountain tiene 200 por defecto.
-MAX_NUM_STEPS= MAX_EPISODES*STEPS_PER_EPISODE     # Máximo de steps.
+MAX_NUM_STEPS= MAX_EPISODES * STEPS_PER_EPISODE   # Máximo de steps.
 EPSILON_MIN = 0.005                               # Aprendizaje minimo permitido hasta la convergencia del modelo.
-EPSILON_DECAY = 500*EPSILON_MIN / MAX_NUM_STEPS   # Caida de epsilon de un paso al siguiente.
-ALPHA = 0.005                                     # Ratio de aprendizaje del modelo
+EPSILON_DECAY = 500 * EPSILON_MIN / MAX_NUM_STEPS # Caida de epsilon de un paso al siguiente.
+ALPHA = 0.05                                      # Ratio de aprendizaje del modelo
 GAMMA = 0.98                                      # Factor de descuento del modelo
 NUM_DISCRETE_BINS = 30                            # Numero de divisones para discretizar las variables continuas.
 
@@ -32,7 +29,8 @@ class QLearn(object):
   def discretize(self, obs):                      # Para crear los bins para las medidas.
     # La observación actual menos el minimo del objeto entre el ancho. Truncamos y devolvemos
     # como tupla para tener x e y
-    return tuple(((obs-self.obs_low) / self.obs_width ).astype(int))
+    return tuple(((obs-self.obs_low) / self.obs_width).astype(int))
+
 
   def get_action(self, obs):
     # Discretizamos la observación que nos devuelve el step
@@ -48,33 +46,61 @@ class QLearn(object):
     if np.random.random() > self.epsilon:
       return np.argmax(self.Q[discrete_obs])
     else:
-      return np.random.choice([a for a in range(self.action_shape)]) # Con probabilidad epsion elegir una al azar.
+      return np.random.choice([a for a in range(self.action_shape)])#Con probabilidad epsilon, elegimos una al azar
 
   def learn(self, obs, action, reward, next_obs):
     # Discretizamos la observación actual y la que generaremos.
     discrete_obs = self.discretize(obs)
     discrete_next_obs = self.discretize(next_obs)
     # Aplicamos la ecuación de Bellman (yo la he separado para entenderla mejor)
-    td_target = reward + self.gamma * np.max(self.Q[discrete_next_obs])
-    td_error = td_target - self.Q[discrete_obs][action]
-    self.Q[discrete_obs][action] += self.alpha*td_error
+    #td_target = reward + self.gamma * np.max(self.Q[discrete_next_obs])
+    #td_error = td_target - self.Q[discrete_obs][action]
+    #self.Q[discrete_obs][action] += self.alpha*td_error
     # Ecuación completa:
     # self.Q[discrete_obs][action] += self.alpha*reward + self.gamma * np.max(self.Q[discrete_next_obs]) - self.Q[discrete_obs][action]
+    self.Q[discrete_obs][action] += self.alpha*(reward + self.gamma * np.max(self.Q[discrete_next_obs]) - self.Q[discrete_obs][action])
 
 
-for episode in range(MAX_EPISODES):
+# Función para entrenar al agente.
+def train(agent, env):
+  best_reward = -float('inf')
+  for episode in range(MAX_EPISODES):
+    done = False
+    total_reward = 0.0
+    obs = env.reset()
+    while not done:
+      action = agent.get_action(obs) # Acción elegida según la ecuación de Q-LEarning
+      next_obs, reward, done, info = env.step(action)
+      agent.learn(obs, action, reward, next_obs)
+      obs = next_obs
+      total_reward += reward
+    if total_reward > best_reward:
+      best_reward = total_reward
+    print("Episode: {} Reward: {} Best Reward: {} Epsilon: {} "
+          .format(episode+1, total_reward, best_reward, agent.epsilon )) 
+  return np.argmax(agent.Q, axis = 2)
+
+# Función para testear lo aprendido.
+def test(agent, env, policy):
   done = False
   total_reward = 0.0
-  observation = env.reset()
-  step = 0
-    
+  obs = env.reset()
   while not done:
-    env.render()
-    action = env.action_space.sample()
-    observation, reward, done, info = env.step(action)
+    #env.render()
+    action = policy[agent.discretize(obs)]
+    next_obs, reward, done, info = env.step(action)
+    obs = next_obs
     total_reward += reward
-    step +=1
-      
-  print("\nEpisode {} finished after {} steps. Total Reward: {}".format(episode+1, step, total_reward))
-        
-env.close()
+    #step +=1
+  return total_reward
+
+if __name__ == '__main__':
+  env = gym.make('MountainCar-v0')
+  agent = QLearn(env)
+  learned_policy = train(agent, env)
+  # Metodo de grabación para evaluar el agente
+  monitor_path = './output'
+  env = gym.wrappers.Monitor(env, monitor_path, force = True)
+  for i in range(20):
+    test(agent, env, learned_policy)
+  env.close()
