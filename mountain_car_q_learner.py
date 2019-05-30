@@ -5,7 +5,7 @@ MAX_EPISODES = 50000
 STEPS_PER_EPISODE = 200                           # Mountain tiene 200 por defecto.
 MAX_NUM_STEPS= MAX_EPISODES * STEPS_PER_EPISODE   # Máximo de steps.
 EPSILON_MIN = 0.005                               # Aprendizaje minimo permitido hasta la convergencia del modelo.
-EPSILON_DECAY = 500 * EPSILON_MIN / MAX_NUM_STEPS # Caida de epsilon de un paso al siguiente.
+EPSILON_DECAY = 300 * EPSILON_MIN / MAX_NUM_STEPS # Caida de epsilon de un paso al siguiente.
 ALPHA = 0.05                                      # Ratio de aprendizaje del modelo
 GAMMA = 0.98                                      # Factor de descuento del modelo
 NUM_DISCRETE_BINS = 30                            # Numero de divisones para discretizar las variables continuas.
@@ -86,7 +86,7 @@ def test(agent, env, policy):
   total_reward = 0.0
   obs = env.reset()
   while not done:
-    #env.render()
+    env.render()
     action = policy[agent.discretize(obs)]
     next_obs, reward, done, info = env.step(action)
     obs = next_obs
@@ -97,10 +97,12 @@ def test(agent, env, policy):
 if __name__ == '__main__':
   env = gym.make('MountainCar-v0')
   agent = QLearn(env)
-  learned_policy = train(agent, env)
+  learned_policy = np.load('learned_policy.npy')
+  #learned_policy = train(agent, env)
+  #np.save('learned_policy', learned_policy)
   # Metodo de grabación para evaluar el agente
-  monitor_path = './output'
-  env = gym.wrappers.Monitor(env, monitor_path, force = True)
-  for i in range(20):
+  #monitor_path = './output'
+  #env = gym.wrappers.Monitor(env, monitor_path, force = True)
+  for i in range(10):
     test(agent, env, learned_policy)
   env.close()
