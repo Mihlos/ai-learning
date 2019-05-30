@@ -12,8 +12,8 @@ MAX_STEPS= 50
 def show_spaces(space):
   print(space)
   if isinstance(space, Box):
-    print('\nCota inferior:\n', space.low)
-    print('\nCota superior:\n', space.high)
+    print('\nCota inferior(low):\n', space.low)
+    print('\nCota superior(high):\n', space.high)
 
 def run_enviroment(argv, env):
   for ep in range(MAX_EPISODES):
