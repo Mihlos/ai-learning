@@ -53,12 +53,15 @@ class QLearn(object):
     # Discretizamos la observación actual y la que generaremos.
     discrete_obs = self.discretize(obs)
     discrete_next_obs = self.discretize(next_obs)
-    # Aplicamos la ecuación de Bellman (yo la he separado para entenderla mejor)
+    
+    # Aplicamos la ecuación de Bellman (la he separado para entenderla mejor)
+    # Nuestro fin es maximizar la ecuación para obtener cada vez valores mayores.
+    
     #td_target = reward + self.gamma * np.max(self.Q[discrete_next_obs])
     #td_error = td_target - self.Q[discrete_obs][action]
     #self.Q[discrete_obs][action] += self.alpha*td_error
+    
     # Ecuación completa:
-    # self.Q[discrete_obs][action] += self.alpha*reward + self.gamma * np.max(self.Q[discrete_next_obs]) - self.Q[discrete_obs][action]
     self.Q[discrete_obs][action] += self.alpha*(reward + self.gamma * np.max(self.Q[discrete_next_obs]) - self.Q[discrete_obs][action])
 
 
@@ -95,7 +98,6 @@ def test(agent, env, policy):
     next_obs, reward, done, info = env.step(action)
     obs = next_obs
     total_reward += reward
-    #step +=1
   return total_reward
 
 # Metodo de grabación para evaluar el agente
@@ -120,6 +122,6 @@ if __name__ == '__main__':
     learned_policy = np.load('../output/learned_policy.npy')
     launch_agent(agent, env, learned_policy)
   else:
-    print('Es necesario espeficicar train o test')
+    print('Es necesario espeficicar la accion deseada como argumento: train o test')
   
   
