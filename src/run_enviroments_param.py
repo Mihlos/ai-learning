@@ -30,7 +30,6 @@ def run_enviroment(argv, env):
 if __name__ == '__main__':
   try:
     env = gym.make(sys.argv[1])
-    
     # Ver el tipo de observaciones, acciones disponibles
     print('Espacio de observaciones:')
     show_spaces(env.observation_space)

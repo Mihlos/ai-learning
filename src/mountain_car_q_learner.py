@@ -71,7 +71,8 @@ def train(agent, env):
     obs = env.reset()
     while not done:
       action = agent.get_action(obs) # Acción elegida según la ecuación de Q-LEarning
-      next_obs, reward, done = env.step(action)
+      # step devuelve 4 valores, hay que espeficiar los 4 si no da error.
+      next_obs, reward, done, info = env.step(action)
       agent.learn(obs, action, reward, next_obs)
       obs = next_obs
       total_reward += reward
@@ -97,17 +98,28 @@ def test(agent, env, policy):
     #step +=1
   return total_reward
 
-if __name__ == '__main__':
-  env = gym.make('MountainCar-v0')
-  agent = QLearn(env)
-  learned_policy = np.load('../output/learned_policy.npy')
-  #learned_policy = train(agent, env)
-  #np.save('../output/learned_policy', learned_policy)
-
-  # Metodo de grabación para evaluar el agente
-  # Con el wrappers no hace falta lanzar el env.render()
+# Metodo de grabación para evaluar el agente
+# Con el wrappers no hace falta lanzar el env.render()
+def launch_agent(agent, env, learned_policy):
   monitor_path = '../media'
   env = gym.wrappers.Monitor(env, monitor_path, video_callable=lambda episode_id: True, force = True)
   for i in range(10):
     test(agent, env, learned_policy)
   env.close()
+
+if __name__ == '__main__':
+  env = gym.make('MountainCar-v0')
+  agent = QLearn(env)
+  selection = sys.argv[1]
+  
+  if selection == 'train':
+    learned_policy = train(agent, env)
+    np.save('../output/learned_policy', learned_policy)
+    launch_agent(agent, env, learned_policy)
+  if selection == 'test':
+    learned_policy = np.load('../output/learned_policy.npy')
+    launch_agent(agent, env, learned_policy)
+  else:
+    print('Es necesario espeficicar train o test')
+  
+  
