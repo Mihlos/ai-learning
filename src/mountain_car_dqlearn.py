@@ -6,8 +6,8 @@ MAX_EPISODES = 50000
 STEPS_PER_EPISODE = 200                           # Mountain tiene 200 por defecto.
 MAX_NUM_STEPS= MAX_EPISODES * STEPS_PER_EPISODE   # Máximo de steps.
 EPSILON_MIN = 0.005                               # Aprendizaje minimo permitido hasta la convergencia del modelo.
-EPSILON_DECAY = 250 * EPSILON_MIN / MAX_NUM_STEPS # Caida de epsilon de un paso al siguiente.
-ALPHA = 0.05                                      # Ratio de aprendizaje del modelo
+EPSILON_DECAY = 350 * EPSILON_MIN / MAX_NUM_STEPS # Caida de epsilon de un paso al siguiente.
+ALPHA = 0.045                                      # Ratio de aprendizaje del modelo
 GAMMA = 0.98                                      # Factor de descuento del modelo
 NUM_DISCRETE_BINS = 30                            # Numero de divisones para discretizar las variables continuas.
 
@@ -54,7 +54,7 @@ class QLearn(object):
     discrete_obs = self.discretize(obs)
     discrete_next_obs = self.discretize(next_obs)
     
-    # Aplicamos la ecuación de Bellman (la he separado para entenderla mejor)
+    # Aplicamos la ecuación de Bellman completa (Q) (Markov) (la he separado para entenderla mejor)
     # Nuestro fin es maximizar la ecuación para obtener cada vez valores mayores.
     
     #td_target = reward + self.gamma * np.max(self.Q[discrete_next_obs])
@@ -118,7 +118,7 @@ if __name__ == '__main__':
     learned_policy = train(agent, env)
     np.save('../output/learned_policy', learned_policy)
     launch_agent(agent, env, learned_policy)
-  if selection == 'test':
+  elif selection == 'test':
     learned_policy = np.load('../output/learned_policy.npy')
     launch_agent(agent, env, learned_policy)
   else:
