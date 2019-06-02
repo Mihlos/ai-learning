@@ -7,7 +7,7 @@ STEPS_PER_EPISODE = 200                           # Mountain tiene 200 por defec
 MAX_NUM_STEPS= MAX_EPISODES * STEPS_PER_EPISODE   # Máximo de steps.
 EPSILON_MIN = 0.005                               # Aprendizaje minimo permitido hasta la convergencia del modelo.
 EPSILON_DECAY = 350 * EPSILON_MIN / MAX_NUM_STEPS # Caida de epsilon de un paso al siguiente.
-ALPHA = 0.045                                      # Ratio de aprendizaje del modelo
+ALPHA = 0.045                                     # Ratio de aprendizaje del modelo
 GAMMA = 0.98                                      # Factor de descuento del modelo
 NUM_DISCRETE_BINS = 30                            # Numero de divisones para discretizar las variables continuas.
 
