@@ -1,8 +1,7 @@
 #import pandas
 #import keras
 
-# Para trabajar con GPU
-from keras import backend as K
+
 
 from keras.models import load_model
 from keras.initializers import RandomUniform
@@ -21,6 +20,13 @@ import random
 from collections import deque
 import tensorflow as tf
 import os
+
+# Para trabajar con GPU
+from keras import backend as K
+
+config = tf.ConfigProto( device_count = {'GPU': 1 , 'CPU': 4} ) 
+sess = tf.Session(config=config) 
+K.set_session(sess)
     
 class AGENT:
     def __init__(self, obs_len, act_len, lr, gamma, s_link, l_link=''):
@@ -83,16 +89,14 @@ class AGENT:
 
     # Modelo
     def MODEL(self):                     
+        # Build Network
         model = Sequential()
-        #linea añadida
-        model.add(Dense(48, input_dim = self.obs_len, activation="relu"))
-        #cambiado el input_dim a borrado, era el de arriba.
-        model.add(Dense(96, activation='relu' , kernel_regularizer = l2(self.weight_decay)))
-        model.add(Dense(192,  activation = 'relu', kernel_regularizer = l2(self.weight_decay)))
-        model.add(Dense(96,  activation = 'relu', kernel_regularizer = l2(self.weight_decay)))
-        model.add(Dense(self.act_len, activation = 'tanh',\
-                        bias_initializer = RandomUniform(minval =- 0.003, maxval = 0.003)))
-        model.compile(loss = 'mse', optimizer = Adam(lr = self.lr))
+        model.add(Dense(600, input_dim=self.obs_len, activation='relu' ,kernel_regularizer=l2(self.weight_decay)))
+        model.add(Dense(300,  activation='relu', kernel_regularizer=l2(self.weight_decay)))
+        model.add(Dense(self.act_len, activation='tanh',\
+                        bias_initializer=RandomUniform(minval=-0.003, maxval=0.003)))
+        model.compile(loss='mse',
+                      optimizer=Adam(lr=self.lr))
                     
         return model
 
@@ -136,11 +140,13 @@ if __name__ == '__main__':
     RENDER_REWARD_MIN = 5000
     RENDER_ENV = False
     if rendering == 'y': RENDER_ENV = True  #flag for rendering the environment
-    EPISODES = 9000    # Number of episodes
-    
+
+    EPISODES = 5000    # Number of episodes
+    MAX_STEPS = 2000
+
     env = gym.make('BipedalWalker-v2')
     env = env.unwrapped
-    
+    env.seed(22)
 
     # Observation and Action array length
     obs_len = env.observation_space.shape[0] 
@@ -182,7 +188,9 @@ if __name__ == '__main__':
             end = time.time()
             time_space = end - start
             
-            if time_space > 10:
+            if counter >= MAX_STEPS:
+                done = True
+            if time_space > 8:
                 done = True
           
             # Sum the episode rewards
@@ -249,15 +257,15 @@ if __name__ == '__main__':
     plt.show()
                 
     plt.figure(figsize=(8,6))            
-    plt.plot(rewards_over_time, label="Rewinards")
+    plt.plot(rewards_over_time, label="Rewards")
     plt.plot(rew_mean, label="Mean")
     plt.plot(rew_var, label="Variance")    
     plt.xlabel("Episodes")
-    plt.ylabel("Rewinards")
-    plt.title("Rewinards per Episode")
+    plt.ylabel("Rewards")
+    plt.title("Rewards per Episode")
     plt.legend(loc=0)
     plt.show()        
-    plt.savefig("Rewinards_per_Episode.png")        
+    plt.savefig("Rewards_per_Episode.png")        
             
     plt.figure(figsize=(8,6))
     plt.plot(mean_100)
