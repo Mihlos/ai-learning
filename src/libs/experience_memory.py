@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Oct 16 17:48:47 2018
-
-@author: juangabriel
-"""
-
 from collections import namedtuple
 import random
 
