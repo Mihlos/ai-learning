@@ -9,7 +9,7 @@ from libs.decay_schedule import LinearDecaySchedule
 from libs.perceptron import SLP
 
 MAX_EPISODES = 50000
-STEPS_PER_EPISODE = 200                           
+STEPS_PER_EPISODE = 200                           # Mountain tiene 200 por defecto.
 
 class QLearn(object):
   def __init__(self, env, learning_rate= 0.05, gamma= 0.98):
@@ -51,7 +51,7 @@ class QLearn(object):
     
 
 if __name__ == '__main__':
-  env = gym.make('CartPole-v2')
+  env = gym.make('LunarLander-v2')
   agent = QLearn(env)
   first_episode = True
   episode_rewards =  list()
