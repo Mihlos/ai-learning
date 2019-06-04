@@ -18,7 +18,7 @@ env = gym.make('BipedalWalker-v2')
 
 obs_len = env.observation_space.shape[0]
 act_len = env.action_space.shape[0]
-episodes = 3000
+episodes = 10
 step = 2000
 trained = 1
 noise = 0
@@ -48,9 +48,9 @@ class Ignition():
         for i in range(self.episodes):
             obs = self.env.reset()
             score = 0
-            for t in range(self.step):
+            for _ in range(self.step):
                 action = agent.act(obs, self.noise)
-                next_state, reward, done, info = env.step(action[0])
+                next_state, reward, done, info = self.env.step(action[0])
                 agent.step(obs, action, reward, next_state, done)
                 # squeeze elimina una dimension del array.
                 obs = next_state.squeeze()
@@ -78,23 +78,26 @@ class Ignition():
         return self.reward_list
 
     def test(self):
-        monitor_path = '../media/Bipedal'
-        #self.env = gym.wrappers.Monitor(self.env, monitor_path, video_callable=lambda episode_id: True, force = True)
+        
         for i in range(self.episodes):
             obs = self.env.reset()
             score = 0
-            for t in range(self.step):
-                env.render()
+            for _ in range(self.step): 
                 action = agent.act(obs, self.noise)
-                next_state, reward, done, info = env.step(action[0])
+                next_state, reward, done, info = self.env.step(action[0])
                 # squeeze elimina una dimension del array.
                 obs = next_state.squeeze()
                 score += reward
-
+                
                 if done:
                     print('Reward: {} | Episode: {}/{}'.format(score, i, self.episodes))
                     break
 
+    def save_videos(self):
+        monitor_path = '../media/Bipedal'
+        self.env = gym.wrappers.Monitor(self.env, monitor_path, video_callable=lambda episode_id: True, force = True)
+        self.test()
+    
     def plot_scores(self):
         fig = plt.figure()
         plt.plot(np.arange(1, len(self.reward_list) + 1), self.reward_list)
@@ -110,7 +113,7 @@ if __name__=='__main__':
         robot.train()
         robot.plot_scores()
     if mode == 'test':
-        robot.test()
+        robot.save_videos()
     
     env.close()
     

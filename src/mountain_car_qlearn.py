@@ -6,7 +6,7 @@ from libs.Qlearn import QLearn
 
 MAX_EPISODES = 50000
 
-# Función para entrenar al agente.
+# Función para entrenar al agente. 
 def train(agent, env):
   best_reward = -float('inf')
   for episode in range(MAX_EPISODES):
@@ -30,24 +30,21 @@ def train(agent, env):
 
 # Función para testear lo aprendido.
 def test(agent, env, policy):
-  done = False
-  total_reward = 0.0
-  obs = env.reset()
-  while not done:
-    #env.render()
-    action = policy[agent.discretize(obs)]
-    next_obs, reward, done, info = env.step(action)
-    obs = next_obs
-    total_reward += reward
-  return total_reward
+  for i in range(10):
+    done = False
+    obs = env.reset()
+    while not done:
+      #env.render()
+      action = policy[agent.discretize(obs)]
+      next_obs, reward, done, info = env.step(action)
+      obs = next_obs
 
 # Metodo de grabación para evaluar el agente
 # Con el wrappers no hace falta lanzar el env.render()
 def launch_agent(agent, env, learned_policy):
   monitor_path = '../media/Mountain'
   env = gym.wrappers.Monitor(env, monitor_path, video_callable=lambda episode_id: True, force = True)
-  for i in range(10):
-    test(agent, env, learned_policy)
+  test(agent, env, learned_policy)
   env.close()
 
 if __name__ == '__main__':
