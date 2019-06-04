@@ -78,7 +78,8 @@ class Ignition():
         return self.reward_list
 
     def test(self):
-        
+        monitor_path = '../media/Bipedal'
+        self.env = gym.wrappers.Monitor(self.env, monitor_path, video_callable=lambda episode_id: True, force = True)
         for i in range(self.episodes):
             obs = self.env.reset()
             score = 0
@@ -92,11 +93,6 @@ class Ignition():
                 if done:
                     print('Reward: {} | Episode: {}/{}'.format(score, i, self.episodes))
                     break
-
-    def save_videos(self):
-        monitor_path = '../media/Bipedal'
-        self.env = gym.wrappers.Monitor(self.env, monitor_path, video_callable=lambda episode_id: True, force = True)
-        self.test()
     
     def plot_scores(self):
         fig = plt.figure()
@@ -113,7 +109,6 @@ if __name__=='__main__':
         robot.train()
         robot.plot_scores()
     if mode == 'test':
-        robot.save_videos()
-    
+        robot.test()
     env.close()
     
