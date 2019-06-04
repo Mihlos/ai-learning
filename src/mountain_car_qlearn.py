@@ -44,7 +44,7 @@ def test(agent, env, policy):
 # Metodo de grabación para evaluar el agente
 # Con el wrappers no hace falta lanzar el env.render()
 def launch_agent(agent, env, learned_policy):
-  monitor_path = '../media'
+  monitor_path = '../media/Mountain'
   env = gym.wrappers.Monitor(env, monitor_path, video_callable=lambda episode_id: True, force = True)
   for i in range(10):
     test(agent, env, learned_policy)

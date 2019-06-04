@@ -9,8 +9,7 @@ import matplotlib.pyplot as plt
 from libs.ddpg_agent import Agent
 
 mode = sys.argv[1]
-if sys.argv[2]:
-    load_path = sys.argv[2]
+load_path = sys.argv[2] if len(sys.argv) == 3 else ''
 
 #env = gym.make('LunarLanderContinuous-v2')
 env = gym.make('BipedalWalker-v2')
@@ -48,13 +47,12 @@ def ddpg(episodes, step, mode, trained, noise, load_path=''):
 
             reward_list.append(score)
 
-            if score >= 150:
+            if score >= 200:
                 print('Task Solved')
-                torch.save(agent.actor_local.state_dict(), 'checkpoint_actor_solved'+score+'.pth')
-                torch.save(agent.critic_local.state_dict(), 'checkpoint_critic_solved'+score+'.pth')
-                torch.save(agent.actor_target.state_dict(), 'checkpoint_actor_t_solved'+score+'.pth')
-                torch.save(agent.critic_target.state_dict(), 'checkpoint_critic_t_solved'+score+'.pth')
-                break
+                torch.save(agent.actor_local.state_dict(), os.path.join('../output/models/Bipedal',  'checkpoint_actor_solved'+str(score)+'.pth'))
+                torch.save(agent.critic_local.state_dict(), os.path.join('../output/models/Bipedal',  'checkpoint_critic_solved'+str(score)+'.pth'))   
+                torch.save(agent.actor_target.state_dict(), os.path.join('../output/models/Bipedal',  'checkpoint_actor_t_solved'+str(score)+'.pth'))
+                torch.save(agent.critic_target.state_dict(), os.path.join('../output/models/Bipedal',  'checkpoint_critic_t_solved'+str(score)+'.pth'))
 
         torch.save(agent.actor_local.state_dict(), 'checkpoint_actor.pth')
         torch.save(agent.critic_local.state_dict(), 'checkpoint_critic.pth')
@@ -92,6 +90,6 @@ def plot_scores(scores):
     plt.show()
 
 if __name__=='__main__':
-    scores = ddpg(episodes=30, step=2000, mode=mode, trained=1, noise=0, load_path=load_path)
+    scores = ddpg(episodes=3000, step=2000, mode=mode, trained=1, noise=0, load_path=load_path)
     plot_scores(scores)
-    
+    env.close()
