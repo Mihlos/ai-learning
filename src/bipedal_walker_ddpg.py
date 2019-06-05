@@ -3,24 +3,59 @@ import torch
 import numpy as np
 import sys
 import os
+import argparse
 
 import matplotlib.pyplot as plt
 
 from libs.ddpg_agent import Agent
 
-# Parámetros de elección
-mode = sys.argv[1]
-load_path = sys.argv[2] if len(sys.argv) == 3 else ''
+parser = argparse.ArgumentParser(description='''
+Script para ejecutar el entorno BipedalWalker de OpenAI Gym.
+Permite entrenar al agente guardando el modelo.
+Permite ver y guardar en .mp4 las ejecuciones de un modelo.
+
+Si elegimos un agente entrenado hay que especificar la ruta
+a los archivos elegidos.''')
+
+parser.add_argument(
+    'mode',
+    type=str,
+    help='Modo de ejecución. Elegir entre train o test.'
+)
+parser.add_argument(
+    'trained',
+    type=str,
+    choices=['yes', 'no'],
+    help='Elegir si el agente tendrá entrenamiento previo o no. [yes/no]'
+)
+parser.add_argument(
+    '-l',
+    '--load',
+    type=str,
+    help='Ruta para cargar el modelo entrenado.'
+)
+parser.add_argument(
+    '-e',
+    '--episodes',
+    default = 10,
+    type=int,
+    help='Número de episodios a realizar.'
+)
+args = parser.parse_args()
+
+# Argumentos de elección
+mode = args.mode
+trained = args.trained
+if trained == 'yes': trained = 1
+else: trained = 0
+load_path = args.load
+episodes = args.episodes
 
 # Parámetros del entorno
 env = gym.make('BipedalWalker-v2')
-#env = gym.make('BipedalWalkerHardcore-v2')
-
 obs_len = env.observation_space.shape[0]
 act_len = env.action_space.shape[0]
-episodes = 10
 step = 2000
-trained = 1
 noise = 0
 
 # Creación del agente
@@ -51,6 +86,7 @@ class Ignition():
             for _ in range(self.step):
                 action = agent.act(obs, self.noise)
                 next_state, reward, done, info = self.env.step(action[0])
+                #Actualiza el aprendizaje del agente.
                 agent.step(obs, action, reward, next_state, done)
                 # squeeze elimina una dimension del array.
                 obs = next_state.squeeze()
@@ -86,7 +122,6 @@ class Ignition():
             for _ in range(self.step): 
                 action = agent.act(obs, self.noise)
                 next_state, reward, done, info = self.env.step(action[0])
-                # squeeze elimina una dimension del array.
                 obs = next_state.squeeze()
                 score += reward
                 
