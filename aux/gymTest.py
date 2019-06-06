@@ -5,7 +5,7 @@ from google_speech import Speech
 
 env = gym.make('BipedalWalker-v2')
 
-expresiones = ['aiba', 'la virgen', 'pero eres tonto', 'no me levanto', 'menuda hostia']
+expresiones = ['aiba', 'la virgen', 'no me levanto', 'menuda hostia']
 MAX_EPISODES= 10
 MAX_STEPS= 500
 

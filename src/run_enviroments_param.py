@@ -33,7 +33,7 @@ if __name__ == '__main__':
     # Ver el tipo de observaciones, acciones disponibles
     print('Espacio de observaciones:')
     show_spaces(env.observation_space)
-    print('Espacio de acciones:', env.action_space.n)
+    print('Espacio de acciones:')
     show_spaces(env.action_space)
     
     run_enviroment(sys.argv, env)
